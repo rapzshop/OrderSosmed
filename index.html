@@ -1,0 +1,138 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaffGemes - Order Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #5865F2; --text: #1e293b; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; padding: 20px; color: var(--text); }
+        .card { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .header h1 { color: var(--primary); text-align: center; font-weight: 800; margin: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+        select, input, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; font-family: inherit; }
+        .hidden { display: none; }
+        .btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        #preview { width: 100%; margin-top: 10px; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header"><h1>RAPZ STORE</h1><p style="text-align:center">Form Order Jasa Suntik Sosmed</p></div>
+    <form id="orderForm">
+        <div class="form-group">
+            <label>Nama Customer</label>
+            <input type="text" id="cust" placeholder="Nama Anda" required>
+        </div>
+        <div class="form-group">
+            <label>Pilih Platform</label>
+            <select id="platform" onchange="toggleP()" required>
+                <option value="">-- Pilih --</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Instagram">Instagram</option>
+            </select>
+        </div>
+
+        <div id="tkGroup" class="hidden">
+            <label>Layanan TikTok</label>
+            <select id="layanan" onchange="toggleL()">
+                <option value="Views">Views</option>
+                <option value="Likes">Likes</option>
+                <option value="Paket FYP">Paket FYP 🔥</option>
+                <option value="Paket Malam">Paket Malam 🌙</option>
+            </select>
+            <div id="inputNormal" style="margin-top:10px">
+                <input type="text" id="qty" placeholder="Jumlah (Contoh: 1000)">
+            </div>
+            <div id="inputSpesial" class="hidden" style="margin-top:10px">
+                <input type="number" id="beliBerapa" placeholder="Beli berapa kali? (Contoh: 1)">
+                <input type="text" id="tambah" placeholder="Tambahan lain?" style="margin-top:10px">
+            </div>
+            <input type="url" id="link" placeholder="Link Video TikTok" style="margin-top:10px">
+        </div>
+
+        <div id="igGroup" class="hidden">
+            <input type="number" id="igQty" placeholder="Jumlah Followers">
+            <input type="url" id="igLink" placeholder="Link Profil Instagram" style="margin-top:10px">
+        </div>
+
+        <div class="form-group" style="margin-top:15px">
+            <label>Bukti Transfer (SS ke Admin WA)</label>
+            <input type="file" id="bukti" accept="image/*" onchange="readImg()" required>
+            <img id="preview">
+        </div>
+
+        <button type="submit" class="btn" id="btnKirim">KIRIM ORDER SEKARANG</button>
+    </form>
+</div>
+
+<script>
+    // Config Kamu
+    const firebaseConfig = {
+        apiKey: "AIzaSyAP4tVbyzcFWfPzw8fbetWShqxPBC1AT5Q",
+        authDomain: "wkwkwk-7e5f0.firebaseapp.com",
+        databaseURL: "https://wkwkwk-7e5f0-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "wkwkwk-7e5f0",
+        storageBucket: "wkwkwk-7e5f0.firebasestorage.app",
+        messagingSenderId: "589564116876",
+        appId: "1:589564116876:web:301e5bdb516c566f2b20a9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function toggleP() {
+        const p = document.getElementById('platform').value;
+        document.getElementById('tkGroup').className = p === 'TikTok' ? '' : 'hidden';
+        document.getElementById('igGroup').className = p === 'Instagram' ? '' : 'hidden';
+    }
+
+    function toggleL() {
+        const l = document.getElementById('layanan').value;
+        const isS = (l === 'Paket FYP' || l === 'Paket Malam');
+        document.getElementById('inputNormal').className = isS ? 'hidden' : '';
+        document.getElementById('inputSpesial').className = isS ? '' : 'hidden';
+    }
+
+    let base64 = "";
+    function readImg() {
+        const file = document.getElementById('bukti').files[0];
+        const reader = new FileReader();
+        reader.onload = e => { 
+            base64 = e.target.result;
+            document.getElementById('preview').src = base64;
+            document.getElementById('preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const b = document.getElementById('btnKirim');
+        b.innerText = "Mengirim..."; b.disabled = true;
+
+        const p = document.getElementById('platform').value;
+        const data = {
+            cust: document.getElementById('cust').value,
+            platform: p,
+            layanan: p === 'TikTok' ? document.getElementById('layanan').value : 'Followers IG',
+            qty: p === 'TikTok' ? (document.getElementById('beliBerapa').value || document.getElementById('qty').value) : document.getElementById('igQty').value,
+            link: p === 'TikTok' ? document.getElementById('link').value : document.getElementById('igLink').value,
+            tambahan: document.getElementById('tambah').value || "-",
+            bukti: base64,
+            status: "pending",
+            time: new Date().toLocaleString()
+        };
+
+        try {
+            await db.ref('orders').push(data);
+            alert("Berhasil! Menunggu ACC Admin.");
+            location.reload();
+        } catch(err) { alert("Gagal: " + err.message); b.disabled = false; b.innerText = "KIRIM ORDER SEKARANG"; }
+    });
+</script>
+</body>
+</html>
