@@ -2,123 +2,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RaffGemes - Order Panel</title>
+    <title>Rapz Store | Professional Social Media Booster</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <style>
-        :root { --primary: #5865F2; --success: #10b981; --text: #1e293b; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; padding: 20px; color: var(--text); }
-        .card { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .header h1 { color: var(--primary); text-align: center; font-weight: 800; margin: 0; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #475569; }
-        select, input { width: 100%; padding: 13px; border-radius: 14px; border: 2px solid #e2e8f0; box-sizing: border-box; font-family: inherit; }
-        .hidden { display: none; }
-        .btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        #preview { width: 100%; margin-top: 10px; border-radius: 12px; display: none; border: 2px solid #e2e8f0; }
-        
-        /* Overlay Sukses */
-        #success-overlay {
-            position: fixed; inset: 0; background: rgba(255,255,255,0.96);
-            z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center;
+        :root {
+            --primary: #5865F2; --accent: #a855f7; --dark: #0f172a;
+            --success: #10b981; --text-sub: #64748b;
         }
-        .check-icon { font-size: 100px; color: var(--success); margin-bottom: 20px; }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc;
+        }
+
+        /* --- LANDING PAGE (PROFESSIONAL EXPLAINED) --- */
+        #landing-page {
+            position: fixed; inset: 0; z-index: 10000;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .landing-content { text-align: center; max-width: 700px; padding: 30px; }
+        .landing-logo { font-size: 55px; font-weight: 900; color: var(--dark); letter-spacing: -2px; margin: 0; }
+        .landing-logo span { background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .landing-desc { 
+            font-size: 16px; color: var(--text-sub); line-height: 1.8; 
+            margin: 20px 0 35px; background: white; padding: 25px; 
+            border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .btn-enter { 
+            padding: 22px 60px; background: var(--dark); color: white; border: none; 
+            border-radius: 24px; font-weight: 800; font-size: 16px; cursor: pointer; 
+            transition: 0.4s; box-shadow: 0 15px 30px rgba(15, 23, 42, 0.2);
+        }
+        .btn-enter:hover { transform: translateY(-5px); background: var(--primary); box-shadow: 0 15px 30px rgba(88, 101, 242, 0.3); }
+
+        /* --- MAIN APP --- */
+        #main-app {
+            display: none; opacity: 0; transform: translateY(30px);
+            transition: all 0.8s ease-out; justify-content: center; padding: 40px 20px;
+        }
+        .container {
+            width: 100%; max-width: 550px; background: white; padding: 45px;
+            border-radius: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.06); border: 1px solid #f1f5f9;
+        }
+
+        .info-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 18px; border-radius: 20px; margin-bottom: 30px; display: flex; gap: 12px; align-items: center; }
+        .info-box p { font-size: 13px; margin: 0; color: #92400e; font-weight: 700; }
+
+        .form-group { margin-bottom: 22px; }
+        label { display: block; font-weight: 800; font-size: 11px; margin-bottom: 10px; color: var(--dark); text-transform: uppercase; letter-spacing: 1px; }
+
+        .input-style {
+            width: 100%; padding: 16px 20px; border-radius: 18px; border: 2px solid #f1f5f9;
+            background: #f8fafc; font-family: inherit; font-size: 14px; font-weight: 600; box-sizing: border-box; transition: 0.3s;
+        }
+        .input-style:focus { outline: none; border-color: var(--primary); background: white; }
+
+        /* MIX UI */
+        .mix-box { background: #f1f5f9; padding: 25px; border-radius: 25px; border: 2px dashed #cbd5e1; margin-bottom: 25px; }
+        .mix-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 15px; }
+        .mix-item label { font-size: 10px; text-align: center; display: block; }
+        .mix-item input { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid #ddd; font-weight: 800; text-align: center; }
+
+        .btn-submit { 
+            width: 100%; padding: 22px; background: var(--dark); color: white; 
+            border: none; border-radius: 24px; font-weight: 900; font-size: 16px;
+            cursor: pointer; transition: 0.4s; margin-top: 10px;
+        }
+        .btn-submit:hover { background: var(--primary); transform: scale(1.02); }
+
+        /* --- SUCCESS OVERLAY & ICON ANIMATION --- */
+        #success-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.98); z-index: 11000;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+            animation: fadeIn 0.5s;
+        }
+        .success-icon { font-size: 100px; color: var(--success); }
+
+        .hidden { display: none !important; }
+        #preview { width: 100%; border-radius: 24px; margin-top: 20px; display: none; border: 4px solid #f8fafc; }
     </style>
 </head>
 <body>
 
-<div id="success-overlay" class="animate__animated">
-    <div class="check-icon animate__animated animate__zoomIn"><i class="fas fa-check-circle"></i></div>
-    <h2 class="animate__animated animate__fadeInUp">ORDER BERHASIL!</h2>
-    <p class="animate__animated animate__fadeInUp">Cek WA, Bot kami sudah mengirim pesan konfirmasi.</p>
+<div id="landing-page">
+    <div class="landing-content animate__animated animate__fadeIn">
+        <h1 class="landing-logo">RAPZ <span>STORE</span></h1>
+        <div class="landing-desc">
+            <b>Selamat Datang di Rapz Store Official.</b><br>
+            Kami adalah penyedia layanan Social Media Marketing terpercaya yang berfokus pada peningkatan engagement akun Anda secara instan dan aman. 
+            Melayani jasa Followers, Views, dan Likes untuk berbagai platform. <br><br>
+            <i>Website ini dikembangkan secara eksklusif oleh <b>Rapz Dev Team</b> untuk menjamin kualitas layanan terbaik.</i>
+        </div>
+        <button class="btn-enter" onclick="enterApp()">START ORDER NOW <i class="fas fa-arrow-right" style="margin-left: 10px;"></i></button>
+    </div>
 </div>
 
-<div class="card">
-    <div class="header">
-        <h1>RAPZ STORE</h1>
-        <p style="text-align:center; font-size: 14px; color: #64748b; margin-bottom: 25px;">Jasa Booster Terpercaya</p>
+<div id="success-overlay">
+    <div class="success-icon animate__animated animate__zoomIn">
+        <i class="fas fa-check-circle"></i>
     </div>
+    <h2 class="animate__animated animate__fadeInUp" style="font-weight: 900; margin-top: 20px; color: var(--dark);">ORDER BERHASIL!</h2>
+    <p class="animate__animated animate__fadeInUp" style="color: var(--text-sub);">Pesanan Anda sudah masuk ke sistem kami.</p>
+    <button onclick="closeSuccess()" class="btn-enter animate__animated animate__fadeInUp" style="padding: 15px 40px; margin-top: 20px;">LANJUT ORDER LAGI</button>
+</div>
 
-    <form id="orderForm">
-        <div class="form-group">
-            <label><i class="fas fa-user"></i> Nama Customer</label>
-            <input type="text" id="cust" placeholder="Nama Lengkap" required>
+<div id="main-app">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 35px;">
+            <h2 style="margin:0; font-weight: 900; letter-spacing: -1px;">ORDER PANEL</h2>
+            <p style="color:var(--text-sub); font-size: 13px; font-weight: 600;">Rapz Store Digital Services</p>
         </div>
 
-        <div class="form-group">
-            <label><i class="fab fa-whatsapp"></i> Nomor WhatsApp (Awalan 62)</label>
-            <input type="number" id="wa" placeholder="Contoh: 62812345678" required>
+        <div class="info-box">
+            <i class="fas fa-shield-alt"></i>
+            <p>PASTIKAN AKUN ANDA TIDAK DI-PRIVATE SELAMA PROSES!</p>
         </div>
 
-        <div class="form-group">
-            <label><i class="fas fa-layer-group"></i> Pilih Platform</label>
-            <select id="platform" onchange="toggleP()" required>
-                <option value="">-- Pilih --</option>
-                <option value="TikTok">TikTok</option>
-                <option value="Instagram">Instagram</option>
-            </select>
-        </div>
-
-        <div id="tkGroup" class="hidden">
+        <form id="orderForm">
             <div class="form-group">
-                <label>Layanan TikTok</label>
-                <select id="layanan" onchange="toggleL()">
-                    <option value="Views">Views</option>
-                    <option value="Likes">Likes</option>
-                    <option value="Paket FYP">Paket FYP 🔥</option>
-                    <option value="Paket Malam">Paket Malam 🌙</option>
+                <label>Nama Lengkap</label>
+                <input type="text" id="cust" class="input-style" placeholder="Nama Anda" required>
+            </div>
+
+            <div class="form-group">
+                <label>Nomor WhatsApp</label>
+                <input type="number" id="wa" class="input-style" placeholder="Contoh: 62812..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Pilih Platform</label>
+                <select id="platform" class="input-style" onchange="toggleP()" required>
+                    <option value="">-- Silakan Pilih --</option>
+                    <option value="TikTok">TikTok</option>
+                    <option value="Instagram">Instagram</option>
                 </select>
             </div>
-            
-            <div id="inputNormal" class="form-group">
-                <label>Jumlah</label>
-                <input type="text" id="qty" placeholder="Contoh: 1000">
-            </div>
-            
-            <div id="inputSpesial" class="hidden">
+
+            <div id="tkGroup" class="hidden">
                 <div class="form-group">
-                    <label>Beli Berapa Kali?</label>
-                    <input type="number" id="beliBerapa" placeholder="Contoh: 1">
+                    <label>Pilih Layanan</label>
+                    <select id="layanan" class="input-style" onchange="toggleL()">
+                        <option value="Views">Views</option>
+                        <option value="Likes">Likes</option>
+                        <option value="Followers">Followers</option>
+                        <option value="Paket FYP">Paket FYP 🔥</option>
+                        <option value="Paket Malam">Paket Malam 🌙</option>
+                        <option value="CAMPURAN">MODE CAMPURAN (MIX MAX 3) 🛠️</option>
+                    </select>
+                </div>
+
+                <div id="inputNormal" class="form-group">
+                    <label>Jumlah (Qty)</label>
+                    <input type="text" id="qty" class="input-style" placeholder="Contoh: 1000">
+                </div>
+
+                <div id="mixModeUI" class="mix-box hidden">
+                    <label style="color:var(--primary); font-size: 10px;">MASUKKAN JUMLAH CAMPURAN:</label>
+                    <div class="mix-grid">
+                        <div class="mix-item"><label>VIEW</label><input type="number" id="mixView" placeholder="0"></div>
+                        <div class="mix-item"><label>LIKE</label><input type="number" id="mixLike" placeholder="0"></div>
+                        <div class="mix-item"><label>FOL</label><input type="number" id="mixFol" placeholder="0"></div>
+                    </div>
+                </div>
+
+                <div id="inputSpesial" class="form-group hidden">
+                    <label>Beli Berapa Paket?</label>
+                    <input type="number" id="beliBerapa" class="input-style" placeholder="Contoh: 1">
+                </div>
+
+                <div class="form-group">
+                    <label>Link Video/Profil</label>
+                    <input type="url" id="link" class="input-style" placeholder="https://...">
+                </div>
+            </div>
+
+            <div id="igGroup" class="hidden">
+                <div class="form-group">
+                    <label>Qty Followers IG</label>
+                    <input type="number" id="igQty" class="input-style" placeholder="Contoh: 500">
                 </div>
                 <div class="form-group">
-                    <label>Catatan Tambahan</label>
-                    <input type="text" id="tambah" placeholder="Contoh: Akun cadangan">
+                    <label>Link Profil Instagram</label>
+                    <input type="url" id="igLink" class="input-style" placeholder="https://...">
                 </div>
             </div>
-            
-            <div class="form-group">
-                <label>Link Video</label>
-                <input type="url" id="link" placeholder="https://vt.tiktok.com/...">
-            </div>
-        </div>
 
-        <div id="igGroup" class="hidden">
             <div class="form-group">
-                <label>Jumlah Followers</label>
-                <input type="number" id="igQty" placeholder="Contoh: 500">
+                <label>Catatan Tambahan (Opsional)</label>
+                <textarea id="tambah" class="input-style" style="height:100px; padding-top:15px;" placeholder="Tulis instruksi khusus jika ada..."></textarea>
             </div>
+
             <div class="form-group">
-                <label>Link Profil Instagram</label>
-                <input type="url" id="igLink" placeholder="https://instagram.com/...">
+                <label>Bukti Transfer (Upload Gambar)</label>
+                <input type="file" id="bukti" accept="image/*" onchange="readImg()" required style="font-size: 12px; font-weight: 700;">
+                <img id="preview">
             </div>
-        </div>
 
-        <div class="form-group">
-            <label><i class="fas fa-receipt"></i> Bukti Transfer</label>
-            <input type="file" id="bukti" accept="image/*" onchange="readImg()" required>
-            <img id="preview">
-        </div>
-
-        <button type="submit" class="btn" id="btnKirim">KIRIM ORDER SEKARANG</button>
-    </form>
+            <button type="submit" class="btn-submit" id="btnKirim">SUBMIT ORDER SEKARANG</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // CONFIG ASLI KAMU
     const firebaseConfig = {
         apiKey: "AIzaSyAP4tVbyzcFWfPzw8fbetWShqxPBC1AT5Q",
         authDomain: "wkwkwk-7e5f0.firebaseapp.com",
@@ -130,10 +224,20 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const FONTE_TOKEN = "AaaAzvco48eS44JBkB7f";
 
-    // FUNGSI ASLI KAMU
+    function enterApp() {
+        const lp = document.getElementById('landing-page');
+        lp.style.opacity = '0';
+        lp.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            lp.style.display = 'none';
+            const main = document.getElementById('main-app');
+            main.style.display = 'flex';
+            setTimeout(() => { main.style.opacity = '1'; main.style.transform = 'translateY(0)'; }, 50);
+        }, 800);
+    }
+
     function toggleP() {
         const p = document.getElementById('platform').value;
         document.getElementById('tkGroup').className = p === 'TikTok' ? '' : 'hidden';
@@ -143,8 +247,10 @@
     function toggleL() {
         const l = document.getElementById('layanan').value;
         const isS = (l === 'Paket FYP' || l === 'Paket Malam');
-        document.getElementById('inputNormal').className = isS ? 'hidden' : '';
-        document.getElementById('inputSpesial').className = isS ? '' : 'hidden';
+        const isMix = (l === 'CAMPURAN');
+        document.getElementById('inputNormal').className = (isS || isMix) ? 'hidden' : 'form-group';
+        document.getElementById('inputSpesial').className = isS ? 'form-group' : 'hidden';
+        document.getElementById('mixModeUI').className = isMix ? 'mix-box' : 'hidden';
     }
 
     let base64 = "";
@@ -154,67 +260,60 @@
         reader.onload = e => { 
             base64 = e.target.result;
             const prev = document.getElementById('preview');
-            prev.src = base64;
-            prev.style.display = 'block';
+            prev.src = base64; prev.style.display = 'block';
         };
         reader.readAsDataURL(file);
     }
 
+    function closeSuccess() {
+        document.getElementById('success-overlay').style.display = 'none';
+        document.getElementById('orderForm').reset();
+        document.getElementById('preview').style.display = 'none';
+        window.scrollTo(0,0);
+    }
+
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // REQUEST KAMU: PERINGATAN PRIVATE AKUN
-        if(!confirm("⚠️ PENTING: Pastikan akun Anda TIDAK DI-PRIVATE agar pesanan lancar. Lanjutkan?")) return;
+        const b = document.getElementById('btnKirim');
+        b.innerText = "Sabar, sedang memproses..."; b.disabled = true;
 
         const waNum = document.getElementById('wa').value;
-        if(!waNum.startsWith('62')) {
-            alert("Nomor WA harus diawali 62 (Contoh: 62812...)");
-            return;
+        const p = document.getElementById('platform').value;
+        const mode = document.getElementById('layanan').value;
+        const name = document.getElementById('cust').value;
+
+        let finalQty = document.getElementById('qty').value;
+        if(mode === 'CAMPURAN') {
+            finalQty = `Mix: V:${document.getElementById('mixView').value || 0}, L:${document.getElementById('mixLike').value || 0}, F:${document.getElementById('mixFol').value || 0}`;
+        } else if (mode === 'Paket FYP' || mode === 'Paket Malam') {
+            finalQty = document.getElementById('beliBerapa').value + " Paket";
         }
 
-        const b = document.getElementById('btnKirim');
-        b.innerText = "Processing..."; b.disabled = true;
-
-        const p = document.getElementById('platform').value;
-        const name = document.getElementById('cust').value;
-        const layanan = p === 'TikTok' ? document.getElementById('layanan').value : 'IG Followers';
-        const qty = p === 'TikTok' ? (document.getElementById('beliBerapa').value || document.getElementById('qty').value) : document.getElementById('igQty').value;
-
         const data = {
-            cust: name,
-            wa: waNum,
-            platform: p,
-            layanan: layanan,
-            qty: qty,
+            cust: name, wa: waNum, platform: p, layanan: mode,
+            qty: p === 'TikTok' ? finalQty : document.getElementById('igQty').value,
             link: p === 'TikTok' ? document.getElementById('link').value : document.getElementById('igLink').value,
-            tambahan: document.getElementById('tambah') ? (document.getElementById('tambah').value || "-") : "-",
-            bukti: base64,
-            status: "pending",
-            time: new Date().toLocaleString("id-ID")
+            tambahan: document.getElementById('tambah').value || "-",
+            bukti: base64, status: "pending", time: new Date().toLocaleString("id-ID")
         };
 
         try {
             await db.ref('orders').push(data);
-
-            // REQUEST KAMU: KIRIM BOT WHATSAPP
-            const waMsg = "*HALO KAK " + name.toUpperCase() + "!* 👋\n\nTerima kasih sudah order di *RaffGemes Service*. Pesanan Anda telah masuk:\n\n🔹 *Item:* " + qty + " " + layanan + "\n🔹 *Status:* Menunggu Antrean 🚀\n\n⚠️ *Note:* Mohon akun tidak di-private.\n\n_Pesan ini dikirim otomatis oleh bot untuk memastikan orderan terkirim. Jika proses dimulai, akan di-chat kembali oleh owner/admin._ ✅";
-
+            
+            // FONTE WHATSAPP NOTIF
+            const msg = `*ORDER MASUK - RAPZ STORE* 👋\n\nHalo Kak *${name.toUpperCase()}*,\nPesanan Anda telah kami terima:\n\n🔹 *Item:* ${data.qty} ${mode}\n🔹 *Platform:* ${p}\n🔹 *Status:* Menunggu Konfirmasi\n\n⚠️ *Mohon akun tidak di-private!* Terma Kasih.`;
             await fetch('https://api.fonnte.com/send', {
                 method: 'POST',
                 headers: { 'Authorization': FONTE_TOKEN },
-                body: new URLSearchParams({ 'target': waNum, 'message': waMsg, 'countryCode': '62' })
+                body: new URLSearchParams({ 'target': waNum, 'message': msg })
             });
 
-            // REQUEST KAMU: ANIMASI CENTANG
-            const overlay = document.getElementById('success-overlay');
-            overlay.style.display = 'flex';
-            overlay.classList.add('animate__fadeIn');
-            
-            setTimeout(() => { location.reload(); }, 3500);
-
+            // SHOW SUCCESS ANIMATION
+            document.getElementById('success-overlay').style.display = 'flex';
+            b.innerText = "SUBMIT ORDER SEKARANG"; b.disabled = false;
         } catch(err) { 
-            alert("Gagal: " + err.message); 
-            b.disabled = false; b.innerText = "KIRIM ORDER SEKARANG"; 
+            alert("Gagal Terkirim: " + err.message); 
+            b.disabled = false; b.innerText = "SUBMIT ORDER SEKARANG";
         }
     });
 </script>
