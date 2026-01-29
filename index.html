@@ -6,30 +6,56 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
     <style>
-        :root { --primary: #5865F2; --text: #1e293b; }
+        :root { --primary: #5865F2; --success: #10b981; --text: #1e293b; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f1f5f9; padding: 20px; color: var(--text); }
-        .card { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .card { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         .header h1 { color: var(--primary); text-align: center; font-weight: 800; margin: 0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
-        select, input, textarea { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; font-family: inherit; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #475569; }
+        select, input { width: 100%; padding: 13px; border-radius: 14px; border: 2px solid #e2e8f0; box-sizing: border-box; font-family: inherit; }
         .hidden { display: none; }
-        .btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        #preview { width: 100%; margin-top: 10px; border-radius: 10px; display: none; }
+        .btn { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        #preview { width: 100%; margin-top: 10px; border-radius: 12px; display: none; border: 2px solid #e2e8f0; }
+        
+        /* Overlay Sukses */
+        #success-overlay {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.96);
+            z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center;
+        }
+        .check-icon { font-size: 100px; color: var(--success); margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
+<div id="success-overlay" class="animate__animated">
+    <div class="check-icon animate__animated animate__zoomIn"><i class="fas fa-check-circle"></i></div>
+    <h2 class="animate__animated animate__fadeInUp">ORDER BERHASIL!</h2>
+    <p class="animate__animated animate__fadeInUp">Cek WA, Bot kami sudah mengirim pesan konfirmasi.</p>
+</div>
+
 <div class="card">
-    <div class="header"><h1>RAPZ STORE</h1><p style="text-align:center">Form Order Jasa Suntik Sosmed</p></div>
+    <div class="header">
+        <h1>RAPZ STORE</h1>
+        <p style="text-align:center; font-size: 14px; color: #64748b; margin-bottom: 25px;">Jasa Booster Terpercaya</p>
+    </div>
+
     <form id="orderForm">
         <div class="form-group">
-            <label>Nama Customer</label>
-            <input type="text" id="cust" placeholder="Nama Anda" required>
+            <label><i class="fas fa-user"></i> Nama Customer</label>
+            <input type="text" id="cust" placeholder="Nama Lengkap" required>
         </div>
+
         <div class="form-group">
-            <label>Pilih Platform</label>
+            <label><i class="fab fa-whatsapp"></i> Nomor WhatsApp (Awalan 62)</label>
+            <input type="number" id="wa" placeholder="Contoh: 62812345678" required>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-layer-group"></i> Pilih Platform</label>
             <select id="platform" onchange="toggleP()" required>
                 <option value="">-- Pilih --</option>
                 <option value="TikTok">TikTok</option>
@@ -38,30 +64,51 @@
         </div>
 
         <div id="tkGroup" class="hidden">
-            <label>Layanan TikTok</label>
-            <select id="layanan" onchange="toggleL()">
-                <option value="Views">Views</option>
-                <option value="Likes">Likes</option>
-                <option value="Paket FYP">Paket FYP 🔥</option>
-                <option value="Paket Malam">Paket Malam 🌙</option>
-            </select>
-            <div id="inputNormal" style="margin-top:10px">
-                <input type="text" id="qty" placeholder="Jumlah (Contoh: 1000)">
+            <div class="form-group">
+                <label>Layanan TikTok</label>
+                <select id="layanan" onchange="toggleL()">
+                    <option value="Views">Views</option>
+                    <option value="Likes">Likes</option>
+                    <option value="Paket FYP">Paket FYP 🔥</option>
+                    <option value="Paket Malam">Paket Malam 🌙</option>
+                </select>
             </div>
-            <div id="inputSpesial" class="hidden" style="margin-top:10px">
-                <input type="number" id="beliBerapa" placeholder="Beli berapa kali? (Contoh: 1)">
-                <input type="text" id="tambah" placeholder="Tambahan lain?" style="margin-top:10px">
+            
+            <div id="inputNormal" class="form-group">
+                <label>Jumlah</label>
+                <input type="text" id="qty" placeholder="Contoh: 1000">
             </div>
-            <input type="url" id="link" placeholder="Link Video TikTok" style="margin-top:10px">
+            
+            <div id="inputSpesial" class="hidden">
+                <div class="form-group">
+                    <label>Beli Berapa Kali?</label>
+                    <input type="number" id="beliBerapa" placeholder="Contoh: 1">
+                </div>
+                <div class="form-group">
+                    <label>Catatan Tambahan</label>
+                    <input type="text" id="tambah" placeholder="Contoh: Akun cadangan">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Link Video</label>
+                <input type="url" id="link" placeholder="https://vt.tiktok.com/...">
+            </div>
         </div>
 
         <div id="igGroup" class="hidden">
-            <input type="number" id="igQty" placeholder="Jumlah Followers">
-            <input type="url" id="igLink" placeholder="Link Profil Instagram" style="margin-top:10px">
+            <div class="form-group">
+                <label>Jumlah Followers</label>
+                <input type="number" id="igQty" placeholder="Contoh: 500">
+            </div>
+            <div class="form-group">
+                <label>Link Profil Instagram</label>
+                <input type="url" id="igLink" placeholder="https://instagram.com/...">
+            </div>
         </div>
 
-        <div class="form-group" style="margin-top:15px">
-            <label>Bukti Transfer (SS ke Admin WA)</label>
+        <div class="form-group">
+            <label><i class="fas fa-receipt"></i> Bukti Transfer</label>
             <input type="file" id="bukti" accept="image/*" onchange="readImg()" required>
             <img id="preview">
         </div>
@@ -71,7 +118,7 @@
 </div>
 
 <script>
-    // Config Kamu
+    // CONFIG ASLI KAMU
     const firebaseConfig = {
         apiKey: "AIzaSyAP4tVbyzcFWfPzw8fbetWShqxPBC1AT5Q",
         authDomain: "wkwkwk-7e5f0.firebaseapp.com",
@@ -84,6 +131,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const FONTE_TOKEN = "AaaAzvco48eS44JBkB7f";
+
+    // FUNGSI ASLI KAMU
     function toggleP() {
         const p = document.getElementById('platform').value;
         document.getElementById('tkGroup').className = p === 'TikTok' ? '' : 'hidden';
@@ -103,35 +153,69 @@
         const reader = new FileReader();
         reader.onload = e => { 
             base64 = e.target.result;
-            document.getElementById('preview').src = base64;
-            document.getElementById('preview').style.display = 'block';
+            const prev = document.getElementById('preview');
+            prev.src = base64;
+            prev.style.display = 'block';
         };
         reader.readAsDataURL(file);
     }
 
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // REQUEST KAMU: PERINGATAN PRIVATE AKUN
+        if(!confirm("⚠️ PENTING: Pastikan akun Anda TIDAK DI-PRIVATE agar pesanan lancar. Lanjutkan?")) return;
+
+        const waNum = document.getElementById('wa').value;
+        if(!waNum.startsWith('62')) {
+            alert("Nomor WA harus diawali 62 (Contoh: 62812...)");
+            return;
+        }
+
         const b = document.getElementById('btnKirim');
-        b.innerText = "Mengirim..."; b.disabled = true;
+        b.innerText = "Processing..."; b.disabled = true;
 
         const p = document.getElementById('platform').value;
+        const name = document.getElementById('cust').value;
+        const layanan = p === 'TikTok' ? document.getElementById('layanan').value : 'IG Followers';
+        const qty = p === 'TikTok' ? (document.getElementById('beliBerapa').value || document.getElementById('qty').value) : document.getElementById('igQty').value;
+
         const data = {
-            cust: document.getElementById('cust').value,
+            cust: name,
+            wa: waNum,
             platform: p,
-            layanan: p === 'TikTok' ? document.getElementById('layanan').value : 'Followers IG',
-            qty: p === 'TikTok' ? (document.getElementById('beliBerapa').value || document.getElementById('qty').value) : document.getElementById('igQty').value,
+            layanan: layanan,
+            qty: qty,
             link: p === 'TikTok' ? document.getElementById('link').value : document.getElementById('igLink').value,
-            tambahan: document.getElementById('tambah').value || "-",
+            tambahan: document.getElementById('tambah') ? (document.getElementById('tambah').value || "-") : "-",
             bukti: base64,
             status: "pending",
-            time: new Date().toLocaleString()
+            time: new Date().toLocaleString("id-ID")
         };
 
         try {
             await db.ref('orders').push(data);
-            alert("Berhasil! Menunggu ACC Admin.");
-            location.reload();
-        } catch(err) { alert("Gagal: " + err.message); b.disabled = false; b.innerText = "KIRIM ORDER SEKARANG"; }
+
+            // REQUEST KAMU: KIRIM BOT WHATSAPP
+            const waMsg = "*HALO KAK " + name.toUpperCase() + "!* 👋\n\nTerima kasih sudah order di *RaffGemes Service*. Pesanan Anda telah masuk:\n\n🔹 *Item:* " + qty + " " + layanan + "\n🔹 *Status:* Menunggu Antrean 🚀\n\n⚠️ *Note:* Mohon akun tidak di-private.\n\n_Pesan ini dikirim otomatis oleh bot untuk memastikan orderan terkirim. Jika proses dimulai, akan di-chat kembali oleh owner/admin._ ✅";
+
+            await fetch('https://api.fonnte.com/send', {
+                method: 'POST',
+                headers: { 'Authorization': FONTE_TOKEN },
+                body: new URLSearchParams({ 'target': waNum, 'message': waMsg, 'countryCode': '62' })
+            });
+
+            // REQUEST KAMU: ANIMASI CENTANG
+            const overlay = document.getElementById('success-overlay');
+            overlay.style.display = 'flex';
+            overlay.classList.add('animate__fadeIn');
+            
+            setTimeout(() => { location.reload(); }, 3500);
+
+        } catch(err) { 
+            alert("Gagal: " + err.message); 
+            b.disabled = false; b.innerText = "KIRIM ORDER SEKARANG"; 
+        }
     });
 </script>
 </body>
